@@ -1,0 +1,605 @@
+/* Estilos customizados para o Sistema Acadêmico */
+
+/* Paleta de cores pastéis neutras */
+:root {
+    --primary-color: #8B9DC3;      /* Azul pastel */
+    --secondary-color: #B8C5D6;    /* Azul claro */
+    --accent-color: #D4E1F5;       /* Azul muito claro */
+    --warm-color: #E8D5C4;         /* Bege quente */
+    --neutral-color: #F5F5F0;      /* Branco neutro */
+    --text-color: #4A4A4A;         /* Cinza escuro */
+    --text-light: #6B6B6B;         /* Cinza médio */
+    --success-color: #A8D5BA;      /* Verde pastel */
+    --warning-color: #F4D03F;      /* Amarelo suave */
+    --error-color: #E8A5A5;        /* Vermelho pastel */
+}
+
+body {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--secondary-color) 100%);
+    min-height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    color: var(--text-color);
+}
+
+/* Navbar */
+.nav-custom {
+    background: var(--primary-color) !important;
+    box-shadow: 0 2px 8px rgba(139, 157, 195, 0.3);
+}
+
+.nav-custom .brand-logo {
+    font-weight: 500;
+    color: var(--neutral-color) !important;
+}
+
+.nav-custom a {
+    color: var(--neutral-color) !important;
+}
+
+.nav-custom #logout-btn {
+    background: var(--warm-color) !important;
+    color: var(--text-color) !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 8px rgba(232, 213, 196, 0.3) !important;
+}
+
+.nav-custom #logout-btn:hover {
+    background: var(--secondary-color) !important;
+    color: var(--neutral-color) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(184, 197, 214, 0.4) !important;
+}
+
+/* Página de Login */
+.login-container {
+    margin-top: 2rem;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.logo-container {
+    background: var(--neutral-color);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(139, 157, 195, 0.2);
+    margin-bottom: 2rem;
+}
+
+.logo-container i {
+    color: var(--primary-color);
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.logo-container h2 {
+    color: var(--text-color);
+    font-weight: 300;
+    margin: 0;
+    font-size: 2.2rem;
+}
+
+.subtitle {
+    color: var(--text-light);
+    font-size: 1.1rem;
+    margin: 0.5rem 0 0 0;
+    font-weight: 300;
+}
+
+.login-card {
+    background: var(--neutral-color);
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(139, 157, 195, 0.2);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.login-card .card-content {
+    padding: 2rem;
+}
+
+.login-card .card-title {
+    color: var(--text-color);
+    font-weight: 400;
+    margin-bottom: 2rem;
+}
+
+.login-card .card-title i {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.login-btn {
+    background: var(--primary-color) !important;
+    border-radius: 25px;
+    padding: 0 2rem;
+    height: 45px;
+    line-height: 45px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(139, 157, 195, 0.3);
+    transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+    background: var(--secondary-color) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 157, 195, 0.4);
+}
+
+.forgot-link {
+    color: var(--primary-color) !important;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.forgot-link:hover {
+    color: var(--secondary-color) !important;
+    text-decoration: underline;
+}
+
+.test-info {
+    margin-top: 1rem;
+}
+
+.test-info .card-panel {
+    background: var(--accent-color) !important;
+    border-radius: 10px;
+    border-left: 4px solid var(--primary-color);
+    color: var(--text-color);
+}
+
+.test-info h6 {
+    color: var(--text-color);
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.test-info ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.test-info li {
+    margin-bottom: 0.5rem;
+    color: var(--text-light);
+}
+
+/* Cards */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.card-title {
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+/* Formulários */
+.input-field input:focus + label {
+    color: var(--primary-color) !important;
+}
+
+.input-field input:focus {
+    border-bottom: 1px solid var(--primary-color) !important;
+    box-shadow: 0 1px 0 0 var(--primary-color) !important;
+}
+
+.input-field .prefix.active {
+    color: var(--primary-color) !important;
+}
+
+.input-field input {
+    color: var(--text-color);
+}
+
+.input-field label {
+    color: var(--text-light);
+}
+
+/* Botões */
+.btn {
+    border-radius: 25px;
+    text-transform: none;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Informações de teste */
+.card-panel {
+    border-radius: 8px;
+    border-left: 4px solid #1976d2;
+}
+
+.card-panel h6 {
+    margin-top: 0;
+    font-weight: 500;
+}
+
+.card-panel ul {
+    margin-bottom: 0;
+}
+
+.card-panel li {
+    margin-bottom: 5px;
+}
+
+/* Dashboard */
+#dashboard-page h4 {
+    color: var(--text-color);
+    font-weight: 600;
+    margin-bottom: 30px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+#dashboard-page h4 i {
+    color: var(--primary-color);
+    margin-right: 10px;
+}
+
+/* Proteção para garantir que as informações permaneçam visíveis */
+#dashboard-page {
+    display: none;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#dashboard-page.active {
+    display: block !important;
+}
+
+#user-info,
+#academic-info,
+#disciplinas-list,
+#aulas-panel {
+    min-height: 50px;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+}
+
+/* Garantir que os cards permaneçam visíveis */
+.card {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+}
+
+/* Proteção específica para informações pessoais e acadêmicas */
+.user-info-item {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+}
+
+.disciplina-item {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+}
+
+/* Forçar visibilidade de todos os elementos do dashboard */
+#dashboard-page * {
+    visibility: visible !important;
+}
+
+/* Informações do usuário */
+.user-info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--accent-color);
+}
+
+.user-info-item:last-child {
+    border-bottom: none;
+}
+
+.user-info-item i {
+    margin-right: 10px;
+    color: var(--primary-color);
+}
+
+.user-info-label {
+    font-weight: 500;
+    min-width: 120px;
+}
+
+.user-info-value {
+    color: #666;
+}
+
+/* Lista de disciplinas */
+.disciplina-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 8px;
+    background-color: var(--accent-color);
+    border-radius: 6px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.disciplina-item i {
+    margin-right: 10px;
+    color: #1976d2;
+}
+
+/* Painel de Aulas */
+.aula-item {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border-left: 4px solid #1976d2;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.aula-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.aula-disciplina {
+    margin: 0;
+    color: #1976d2;
+    font-weight: 500;
+    flex: 1;
+}
+
+.aula-status {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.aula-status i {
+    margin-right: 4px;
+}
+
+.aula-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.aula-info {
+    flex: 1;
+    min-width: 250px;
+}
+
+.aula-info p {
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+}
+
+.aula-info i {
+    margin-right: 8px;
+    color: #666;
+}
+
+.aula-presenca {
+    flex: 1;
+    min-width: 200px;
+}
+
+.presenca-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+    margin: 0 8px;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    display: block;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.presenca-bar {
+    margin-top: 8px;
+}
+
+.progress {
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress .determinate {
+    background-color: #4caf50;
+    transition: width 0.3s ease;
+}
+
+/* Responsividade para o painel de aulas */
+@media only screen and (max-width: 600px) {
+    .aula-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .aula-status {
+        margin-top: 8px;
+    }
+    
+    .aula-details {
+        flex-direction: column;
+    }
+    
+    .presenca-stats {
+        justify-content: space-around;
+    }
+    
+    .stat-item {
+        margin: 0 4px;
+    }
+}
+
+/* Modal */
+.modal {
+    border-radius: 8px;
+}
+
+.modal-content h4 {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.modal-footer {
+    padding: 20px;
+}
+
+/* Links */
+#forgot-password-link {
+    text-decoration: none;
+    font-weight: 500;
+}
+
+#forgot-password-link:hover {
+    text-decoration: underline;
+}
+
+/* Responsividade */
+@media only screen and (max-width: 600px) {
+    .container {
+        width: 95%;
+    }
+    
+    .card-title {
+        font-size: 1.5rem;
+    }
+    
+    .user-info-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .user-info-label {
+        min-width: auto;
+        margin-bottom: 5px;
+    }
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Loading spinner */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Mensagens de erro e sucesso */
+.message {
+    padding: 12px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-weight: 500;
+    animation: slideIn 0.3s ease-in-out;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.message.success {
+    background-color: var(--success-color);
+    color: var(--text-color);
+    border: 1px solid var(--success-color);
+}
+
+.message.error {
+    background-color: var(--error-color);
+    color: var(--text-color);
+    border: 1px solid var(--error-color);
+}
+
+.message.warning {
+    background-color: var(--warning-color);
+    color: var(--text-color);
+    border: 1px solid var(--warning-color);
+}
+
+/* Mensagens persistentes */
+.message.persistente {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    margin: 0 0 20px 0;
+    border-left: 4px solid #28a745;
+    font-size: 1.1rem;
+    padding: 15px;
+}
+
+/* Animação para mensagens */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+} 
