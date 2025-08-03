@@ -40,6 +40,24 @@ let usuarios = [
     }
 ];
 
+// Sistema de sessões (em memória)
+const sessions = new Map();
+const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutos
+
+// Função para limpar sessões expiradas
+function cleanupExpiredSessions() {
+    const now = Date.now();
+    for (const [sessionId, session] of sessions.entries()) {
+        if (now - session.lastActivity > SESSION_TIMEOUT) {
+            sessions.delete(sessionId);
+            console.log(`Sessão ${sessionId} expirada e removida`);
+        }
+    }
+}
+
+// Executar limpeza a cada minuto
+setInterval(cleanupExpiredSessions, 60 * 1000);
+
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
@@ -111,9 +129,20 @@ app.post('/api/auth/login', (req, res) => {
     
     usuario.tentativas = 0;
     
+    // Criar sessão
+    const sessionId = Math.random().toString(36).substring(2, 15);
+    const session = {
+        userId: usuario.id,
+        email: usuario.email,
+        lastActivity: Date.now()
+    };
+    sessions.set(sessionId, session);
+    console.log(`Sessão criada: ${sessionId} para ${email}`);
+    
     res.json({
         success: true,
         message: 'Login realizado com sucesso!',
+        sessionId: sessionId,
         usuario: {
             id: usuario.id,
             nome: usuario.nome,
@@ -131,24 +160,23 @@ app.post('/api/auth/remember-password', (req, res) => {
     if (!email) {
         return res.status(400).json({
             success: false,
-            message: 'Email é obrigatório!'
+            message: 'Email é obrigatório'
         });
     }
     
     // Usando dados compartilhados
-    
     const usuario = usuarios.find(u => u.email === email);
     
     if (!usuario) {
         return res.status(404).json({
             success: false,
-            message: 'Email não encontrado no sistema!'
+            message: 'Email não encontrado no sistema'
         });
     }
     
     res.json({
         success: true,
-        message: `Email enviado para ${email} com instruções para redefinir a senha.`
+        message: 'Email de recuperação enviado'
     });
 });
 
@@ -192,8 +220,42 @@ app.get('/api/auth/status', (req, res) => {
     });
 });
 
+// Middleware para verificar sessão
+function checkSession(req, res, next) {
+    const sessionId = req.headers['x-session-id'];
+    
+    if (!sessionId || !sessions.has(sessionId)) {
+        return res.status(401).json({
+            success: false,
+            message: 'Sessão inválida ou expirada'
+        });
+    }
+    
+    const session = sessions.get(sessionId);
+    session.lastActivity = Date.now(); // Atualizar atividade
+    
+    req.session = session;
+    next();
+}
+
+// Rota para verificar se a sessão ainda é válida
+app.get('/api/auth/check-session', checkSession, (req, res) => {
+    res.json({
+        success: true,
+        message: 'Sessão válida'
+    });
+});
+
 // Rota para logout
 app.post('/api/auth/logout', (req, res) => {
+    const sessionId = req.headers['x-session-id'];
+    
+    // Remover sessão se existir
+    if (sessionId && sessions.has(sessionId)) {
+        sessions.delete(sessionId);
+        console.log(`Sessão ${sessionId} removida durante logout`);
+    }
+    
     res.json({
         success: true,
         message: 'Logout realizado com sucesso!'
@@ -203,6 +265,7 @@ app.post('/api/auth/logout', (req, res) => {
 app.listen(PORT, () => {
     console.log(`\n🚀 Servidor rodando na porta ${PORT}`);
     console.log(`🌐 Acesse: http://localhost:${PORT}`);
+    console.log(`✅ Sistema de sessões ativo - timeout de 5 minutos por inatividade`);
     console.log(`✅ Dados compartilhados entre rotas - tentativas agora são persistidas durante a sessão!`);
     console.log(`⚠️  ATENÇÃO: Dados ainda são resetados a cada reinicialização do servidor`);
     console.log(`📝 Para persistência permanente, implemente banco de dados ou arquivo JSON`);
