@@ -333,12 +333,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Email de recuperação enviado com sucesso
                 mostrarMensagem('Email de recuperação enviado', 'success');
                 
-                // Fechar modal
-                const modal = M.Modal.getInstance(forgotPasswordModal);
-                modal.close();
-                
                 // Limpar formulário
                 forgotPasswordForm.reset();
+                
+                // Aguardar 3 segundos antes de fechar o modal
+                setTimeout(() => {
+                    const modal = M.Modal.getInstance(forgotPasswordModal);
+                    modal.close();
+                }, 3000);
             } else {
                 // Email não encontrado no sistema
                 if (response.status === 404) {
