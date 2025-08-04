@@ -1,4 +1,11 @@
 // Sistema Acadêmico - Frontend JavaScript
+// 
+// Funcionalidades de Segurança Implementadas:
+// - Timeout por inatividade (5 minutos)
+// - Verificação de sessão no servidor ao abrir nova aba
+// - Logout automático quando sessão expira
+// - Verificação de sessão ao voltar para a aba
+// - Limpeza automática de dados ao fechar aba
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM carregado, inicializando aplicação...');
@@ -20,23 +27,191 @@ document.addEventListener('DOMContentLoaded', function() {
     const dashboardPage = document.getElementById('dashboard-page');
     const logoutBtn = document.getElementById('logout-btn');
     
-    // Verificar se o usuário já está logado
-    const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
-    if (usuarioLogado) {
-        // Mostrar mensagem de boas-vindas persistente
-        mostrarMensagem(`Bem-vindo, ${usuarioLogado.email}!`, 'success', true);
-        mostrarDashboard(usuarioLogado);
-    } else {
-        // Garantir que apenas a página de login seja exibida
+    // Sistema de timeout por inatividade (5 minutos = 300000ms)
+    let inactivityTimer;
+    const TIMEOUT_DURATION = 5 * 60 * 1000; // 5 minutos
+
+    // Função para resetar o timer de inatividade
+    function resetInactivityTimer() {
+        if (inactivityTimer) {
+            clearTimeout(inactivityTimer);
+        }
+        
+        // Só configurar timer se o usuário estiver logado
+        const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
+        if (usuarioLogado) {
+            inactivityTimer = setTimeout(() => {
+                console.log('Timeout por inatividade - fazendo logout automático');
+                handleLogoutAuto();
+            }, TIMEOUT_DURATION);
+        }
+    }
+
+    // Função para logout automático (sem parâmetro de evento)
+    function handleLogoutAuto() {
+        console.log('Logout automático iniciado...');
+        
+        // Limpar localStorage
+        localStorage.removeItem('usuarioLogado');
+        localStorage.removeItem('sessionId');
+        
+        // Mostrar página de login
         loginPage.style.display = 'block';
         dashboardPage.style.display = 'none';
+        dashboardPage.classList.remove('active');
         logoutBtn.style.display = 'none';
+        
+        // Limpar formulário
+        loginForm.reset();
+        
+        // Remover todas as mensagens
+        const todasMensagens = document.querySelectorAll('.message');
+        todasMensagens.forEach(msg => msg.remove());
+        
+        // Mostrar mensagem de timeout
+        mostrarMensagem('Sessão expirada por inatividade. Faça login novamente.', 'warning');
+        
+        // Limpar timer
+        if (inactivityTimer) {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = null;
+        }
+        
+        // Tentar notificar o servidor sobre o logout (opcional)
+        const sessionId = localStorage.getItem('sessionId');
+        if (sessionId) {
+            fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-session-id': sessionId
+                }
+            }).catch(error => {
+                console.error('Erro ao notificar logout no servidor:', error);
+            });
+        }
     }
+
+    // Event listeners para detectar atividade do usuário
+    function setupInactivityDetection() {
+        const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+        
+        events.forEach(event => {
+            document.addEventListener(event, resetInactivityTimer, true);
+        });
+        
+        // Detectar quando a aba/janela fica inativa
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Página ficou inativa, pausar timer
+                if (inactivityTimer) {
+                    clearTimeout(inactivityTimer);
+                }
+            } else {
+                // Página voltou a ser ativa, verificar sessão e resetar timer
+                const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
+                const sessionId = localStorage.getItem('sessionId');
+                
+                if (usuarioLogado && sessionId) {
+                    // Verificar se a sessão ainda é válida
+                    fetch('/api/auth/check-session', {
+                        headers: {
+                            'x-session-id': sessionId
+                        }
+                    }).then(response => {
+                        if (response.ok) {
+                            // Sessão válida, resetar timer
+                            resetInactivityTimer();
+                        } else {
+                            // Sessão expirada, fazer logout automático
+                            console.log('Sessão expirada ao voltar para a aba');
+                            handleLogoutAuto();
+                        }
+                    }).catch(error => {
+                        console.error('Erro ao verificar sessão ao voltar para a aba:', error);
+                        // Em caso de erro, fazer logout por segurança
+                        handleLogoutAuto();
+                    });
+                } else {
+                    // Resetar timer se não há sessão
+                    resetInactivityTimer();
+                }
+            }
+        });
+    }
+
+    // Verificar se o usuário já está logado E se a sessão ainda é válida
+    async function verificarSessaoInicial() {
+        const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
+        const sessionId = localStorage.getItem('sessionId');
+        
+        if (usuarioLogado && sessionId) {
+            try {
+                const response = await fetch('/api/auth/check-session', {
+                    headers: {
+                        'x-session-id': sessionId
+                    }
+                });
+                
+                if (response.ok) {
+                    // Sessão válida - fazer login automático
+                    mostrarMensagem(`Bem-vindo, ${usuarioLogado.email}!`, 'success', true);
+                    mostrarDashboard(usuarioLogado);
+                    resetInactivityTimer();
+                } else {
+                    // Sessão expirada - limpar dados e mostrar login
+                    localStorage.removeItem('usuarioLogado');
+                    localStorage.removeItem('sessionId');
+                    mostrarMensagem('Sua sessão expirou. Faça login novamente.', 'warning');
+                    
+                    // Garantir que apenas a página de login seja exibida
+                    loginPage.style.display = 'block';
+                    dashboardPage.style.display = 'none';
+                    logoutBtn.style.display = 'none';
+                }
+            } catch (error) {
+                // Erro de conexão - limpar dados por segurança
+                localStorage.removeItem('usuarioLogado');
+                localStorage.removeItem('sessionId');
+                console.error('Erro ao verificar sessão:', error);
+                
+                // Garantir que apenas a página de login seja exibida
+                loginPage.style.display = 'block';
+                dashboardPage.style.display = 'none';
+                logoutBtn.style.display = 'none';
+            }
+        } else {
+            // Garantir que apenas a página de login seja exibida
+            loginPage.style.display = 'block';
+            dashboardPage.style.display = 'none';
+            logoutBtn.style.display = 'none';
+        }
+    }
+
+    // Inicializar sistema de detecção de inatividade
+    setupInactivityDetection();
+
+    // Verificar sessão inicial
+    verificarSessaoInicial();
+    
+    // Detectar quando a janela/aba é fechada
+    window.addEventListener('beforeunload', () => {
+        // Limpar timer de inatividade
+        if (inactivityTimer) {
+            clearTimeout(inactivityTimer);
+        }
+    });
     
     // Event Listeners
     loginForm.addEventListener('submit', handleLogin);
     forgotPasswordLink.addEventListener('click', abrirModalEsqueciSenha);
     forgotPasswordForm.addEventListener('submit', handleEsqueciSenha);
+    
+    // Limpar mensagens quando o modal for fechado
+    forgotPasswordModal.addEventListener('modal:close', function() {
+        const mensagens = forgotPasswordModal.querySelectorAll('.message');
+        mensagens.forEach(msg => msg.remove());
+    });
     
     // Verificar se o botão de logout existe antes de adicionar o listener
     if (logoutBtn) {
@@ -76,8 +251,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             
             if (data.success) {
-                // Salvar dados do usuário no localStorage
+                // Salvar dados do usuário e sessionId no localStorage
                 localStorage.setItem('usuarioLogado', JSON.stringify(data.usuario));
+                if (data.sessionId) {
+                    localStorage.setItem('sessionId', data.sessionId);
+                }
+                
+                // Inicializar sistema de timeout
+                resetInactivityTimer();
                 
                 // Mostrar mensagem de boas-vindas personalizada (persistente)
                 mostrarMensagem(`Bem-vindo, ${data.usuario.email}!`, 'success', true);
@@ -100,6 +281,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Função para abrir modal de esqueci a senha
     function abrirModalEsqueciSenha(e) {
         e.preventDefault();
+        
+        // Limpar mensagens anteriores do modal
+        const mensagens = forgotPasswordModal.querySelectorAll('.message');
+        mensagens.forEach(msg => msg.remove());
+        
+        // Limpar formulário
+        forgotPasswordForm.reset();
+        
         const modal = M.Modal.getInstance(forgotPasswordModal);
         modal.open();
     }
@@ -108,10 +297,18 @@ document.addEventListener('DOMContentLoaded', function() {
     async function handleEsqueciSenha(e) {
         e.preventDefault();
         
-        const email = document.getElementById('recovery-email').value;
+        const email = document.getElementById('recovery-email').value.trim();
         
+        // Validação de email obrigatório
         if (!email) {
-            mostrarMensagem('Por favor, digite seu email.', 'error');
+            mostrarMensagem('Email é obrigatório', 'error');
+            return;
+        }
+        
+        // Validação básica de formato de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            mostrarMensagem('Por favor, digite um email válido', 'error');
             return;
         }
         
@@ -133,7 +330,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             
             if (data.success) {
-                mostrarMensagem(data.message, 'success');
+                // Email de recuperação enviado com sucesso
+                mostrarMensagem('Email de recuperação enviado', 'success');
                 
                 // Fechar modal
                 const modal = M.Modal.getInstance(forgotPasswordModal);
@@ -142,7 +340,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Limpar formulário
                 forgotPasswordForm.reset();
             } else {
-                mostrarMensagem(data.message, 'error');
+                // Email não encontrado no sistema
+                if (response.status === 404) {
+                    mostrarMensagem('Email não encontrado no sistema', 'error');
+                } else {
+                    mostrarMensagem(data.message, 'error');
+                }
             }
         } catch (error) {
             console.error('Erro ao solicitar recuperação:', error);
@@ -573,12 +776,25 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         console.log('Logout iniciado...');
         
+        // Limpar timer de inatividade
+        if (inactivityTimer) {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = null;
+        }
+        
         try {
+            const sessionId = localStorage.getItem('sessionId');
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            
+            if (sessionId) {
+                headers['x-session-id'] = sessionId;
+            }
+            
             const response = await fetch('/api/auth/logout', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                headers: headers
             });
             console.log('Resposta do logout:', response.status);
         } catch (error) {
@@ -587,6 +803,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Limpar localStorage
         localStorage.removeItem('usuarioLogado');
+        localStorage.removeItem('sessionId');
         console.log('LocalStorage limpo');
         
         // Mostrar página de login
@@ -636,9 +853,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         messageDiv.textContent = mensagem;
         
-        // Inserir mensagem no topo da página
-        const container = document.querySelector('.container');
-        container.insertBefore(messageDiv, container.firstChild);
+        // Verificar se estamos no modal de recuperação de senha
+        const modal = document.getElementById('forgot-password-modal');
+        const modalContent = modal ? modal.querySelector('.modal-content') : null;
+        
+        if (modalContent && modal.classList.contains('open')) {
+            // Se o modal estiver aberto, inserir a mensagem no modal
+            const form = modalContent.querySelector('form');
+            if (form) {
+                // Inserir antes do formulário
+                modalContent.insertBefore(messageDiv, form);
+            } else {
+                // Inserir no final do modal
+                modalContent.appendChild(messageDiv);
+            }
+        } else {
+            // Inserir mensagem no topo da página
+            const container = document.querySelector('.container');
+            container.insertBefore(messageDiv, container.firstChild);
+        }
         
         // Remover mensagem após 5 segundos (apenas se não for persistente)
         if (!persistente) {
@@ -646,7 +879,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (messageDiv.parentNode && !messageDiv.classList.contains('persistente')) {
                     messageDiv.remove();
                 }
-            }, 50000);
+            }, 5000);
         }
     }
     
@@ -684,4 +917,27 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1000);
         }
     });
+
+    // Verificar sessão a cada 30 segundos
+    setInterval(async () => {
+        const sessionId = localStorage.getItem('sessionId');
+        const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
+        
+        if (sessionId && usuarioLogado) {
+            try {
+                const response = await fetch('/api/auth/check-session', {
+                    headers: {
+                        'x-session-id': sessionId
+                    }
+                });
+                
+                if (!response.ok) {
+                    console.log('Sessão expirada no servidor');
+                    handleLogoutAuto();
+                }
+            } catch (error) {
+                console.error('Erro ao verificar sessão:', error);
+            }
+        }
+    }, 30000);
 }); 
