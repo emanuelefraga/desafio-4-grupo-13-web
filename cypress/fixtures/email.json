@@ -1,0 +1,8 @@
+{
+    "valido":{
+        "email": "aluno3@universidade.edu.br"
+    },
+    "formatoInvalido":{
+        "email": "aluno3@universidade"
+    }
+}

@@ -94,7 +94,7 @@ app.post('/api/auth/login', (req, res) => {
     if (usuario.bloqueado) {
         return res.status(401).json({
             success: false,
-            message: 'Conta bloqueada devido a múltiplas tentativas de login inválidas!'
+            message: 'Conta bloqueada após 3 tentativas inválidas!'
         });
     }
     
