@@ -7,6 +7,9 @@
 // - Verificação de sessão ao voltar para a aba
 // - Limpeza automática de dados ao fechar aba
 
+// URL base da API externa
+const API_BASE_URL = 'http://localhost:3001';
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM carregado, inicializando aplicação...');
     
@@ -36,9 +39,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (inactivityTimer) {
             clearTimeout(inactivityTimer);
         }
-        
-        // Só configurar timer se o usuário estiver logado
-        const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
+
+        const usuarioLogadoStr = localStorage.getItem('usuarioLogado');
+        let usuarioLogado = null;
+        if (usuarioLogadoStr) {
+            try {
+                usuarioLogado = JSON.parse(usuarioLogadoStr);
+            } catch (e) {
+                usuarioLogado = null;
+            }
+        }
         if (usuarioLogado) {
             inactivityTimer = setTimeout(() => {
                 console.log('Timeout por inatividade - fazendo logout automático');
@@ -78,6 +88,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Tentar notificar o servidor sobre o logout (opcional)
+        // Comentado: endpoint não existe na API externa
+        /*
         const sessionId = localStorage.getItem('sessionId');
         if (sessionId) {
             fetch('/api/auth/logout', {
@@ -90,6 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Erro ao notificar logout no servidor:', error);
             });
         }
+        */
     }
 
     // Event listeners para detectar atividade do usuário
@@ -101,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Detectar quando a aba/janela fica inativa
-        document.addEventListener('visibilitychange', () => {
+        document.addEventListener('visibilitychange', async () => {
             if (document.hidden) {
                 // Página ficou inativa, pausar timer
                 if (inactivityTimer) {
@@ -113,25 +126,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 const sessionId = localStorage.getItem('sessionId');
                 
                 if (usuarioLogado && sessionId) {
-                    // Verificar se a sessão ainda é válida
-                    fetch('/api/auth/check-session', {
-                        headers: {
-                            'x-session-id': sessionId
-                        }
-                    }).then(response => {
+                    // Verificar se a API está disponível ao voltar para a aba
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/auth/status?email=${encodeURIComponent(usuarioLogado.email)}`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
                         if (response.ok) {
-                            // Sessão válida, resetar timer
+                            // API disponível - resetar timer
+                            console.log('API disponível ao voltar para a aba - resetando timer');
                             resetInactivityTimer();
                         } else {
-                            // Sessão expirada, fazer logout automático
-                            console.log('Sessão expirada ao voltar para a aba');
+                            // API retornou erro - fazer logout
+                            console.log('API retornou erro ao voltar para a aba - fazendo logout');
                             handleLogoutAuto();
                         }
-                    }).catch(error => {
-                        console.error('Erro ao verificar sessão ao voltar para a aba:', error);
-                        // Em caso de erro, fazer logout por segurança
+                    } catch (error) {
+                        // Erro de conexão - fazer logout por segurança
+                        console.log('Erro de conexão ao voltar para a aba - fazendo logout:', error);
                         handleLogoutAuto();
-                    });
+                    }
                 } else {
                     // Resetar timer se não há sessão
                     resetInactivityTimer();
@@ -146,20 +163,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const sessionId = localStorage.getItem('sessionId');
         
         if (usuarioLogado && sessionId) {
+            // Tentar verificar se a API está disponível antes de fazer logout
             try {
-                const response = await fetch('/api/auth/check-session', {
+                // Testar conexão com a API fazendo uma requisição simples
+                const response = await fetch(`${API_BASE_URL}/api/auth/status?email=${encodeURIComponent(usuarioLogado.email)}`, {
+                    method: 'GET',
                     headers: {
-                        'x-session-id': sessionId
+                        'Content-Type': 'application/json'
                     }
                 });
                 
                 if (response.ok) {
-                    // Sessão válida - fazer login automático
+                    // API está disponível - fazer login automático
+                    console.log('API disponível - fazendo login automático');
                     mostrarMensagem(`Bem-vindo, ${usuarioLogado.email}!`, 'success', true);
                     mostrarDashboard(usuarioLogado);
                     resetInactivityTimer();
                 } else {
-                    // Sessão expirada - limpar dados e mostrar login
+                    // API retornou erro - fazer logout
+                    console.log('API retornou erro - fazendo logout');
                     localStorage.removeItem('usuarioLogado');
                     localStorage.removeItem('sessionId');
                     mostrarMensagem('Sua sessão expirou. Faça login novamente.', 'warning');
@@ -170,10 +192,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     logoutBtn.style.display = 'none';
                 }
             } catch (error) {
-                // Erro de conexão - limpar dados por segurança
+                // Erro de conexão com a API - fazer logout
+                console.log('Erro de conexão com a API - fazendo logout:', error);
                 localStorage.removeItem('usuarioLogado');
                 localStorage.removeItem('sessionId');
-                console.error('Erro ao verificar sessão:', error);
+                mostrarMensagem('Erro de conexão com o servidor. Faça login novamente.', 'warning');
                 
                 // Garantir que apenas a página de login seja exibida
                 loginPage.style.display = 'block';
@@ -196,6 +219,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Detectar quando a janela/aba é fechada
     window.addEventListener('beforeunload', () => {
+        // Fazer logout ao fechar aba
+        console.log('Aba sendo fechada - fazendo logout automático');
+        localStorage.removeItem('usuarioLogado');
+        localStorage.removeItem('sessionId');
+        
         // Limpar timer de inatividade
         if (inactivityTimer) {
             clearTimeout(inactivityTimer);
@@ -240,19 +268,19 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.disabled = true;
         
         try {
-            const response = await fetch('/api/auth/login', {
+            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ email, senha })
+                body: JSON.stringify({ email, password: senha }) // <-- ALTERADO AQUI
             });
             
             const data = await response.json();
             
             if (data.success) {
                 // Salvar dados do usuário e sessionId no localStorage
-                localStorage.setItem('usuarioLogado', JSON.stringify(data.usuario));
+                localStorage.setItem('usuarioLogado', JSON.stringify(data.user));
                 if (data.sessionId) {
                     localStorage.setItem('sessionId', data.sessionId);
                 }
@@ -261,10 +289,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 resetInactivityTimer();
                 
                 // Mostrar mensagem de boas-vindas personalizada (persistente)
-                mostrarMensagem(`Bem-vindo, ${data.usuario.email}!`, 'success', true);
+                mostrarMensagem(`Bem-vindo, ${data.user.email}!`, 'success', true);
                 
                 // Mostrar dashboard imediatamente
-                mostrarDashboard(data.usuario);
+                mostrarDashboard(data.user);
             } else {
                 mostrarMensagem(data.message, 'error');
             }
@@ -319,7 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.disabled = true;
         
         try {
-            const response = await fetch('/api/auth/remember-password', {
+            const response = await fetch(`${API_BASE_URL}/api/auth/remember-password`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -784,6 +812,8 @@ document.addEventListener('DOMContentLoaded', function() {
             inactivityTimer = null;
         }
         
+        // Comentado: endpoint não existe na API externa
+        /*
         try {
             const sessionId = localStorage.getItem('sessionId');
             const headers = {
@@ -802,6 +832,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Erro ao fazer logout:', error);
         }
+        */
         
         // Limpar localStorage
         localStorage.removeItem('usuarioLogado');
@@ -888,7 +919,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Função para verificar status da conta
     async function verificarStatusConta(email) {
         try {
-            const response = await fetch(`/api/auth/status?email=${encodeURIComponent(email)}`);
+            const response = await fetch(`${API_BASE_URL}/api/auth/status?email=${encodeURIComponent(email)}`);
             const data = await response.json();
             
             if (data.success) {
@@ -921,6 +952,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Verificar sessão a cada 30 segundos
+    // Comentado: endpoint não existe na API externa
+    /*
     setInterval(async () => {
         const sessionId = localStorage.getItem('sessionId');
         const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
@@ -942,4 +975,5 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }, 30000);
-}); 
+    */
+});
