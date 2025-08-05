@@ -19,11 +19,11 @@ describe('Login', () => {
 
     if (match) {
       const tentativas = match[1]
-      const mensagemEsperada = `Senha incorreta! Tentativas restantes: ${tentativas}`
+      const mensagemEsperada = `Email ou senha inválidos. Tentativas restantes: ${tentativas}`
       expect(mensagem).to.eq(mensagemEsperada);
     } else {
       // Valida se a mensagem é a de conta bloqueada
-      expect(mensagem).to.eq('Conta bloqueada após 3 tentativas inválidas!')
+      expect(mensagem).to.eq('Conta bloqueada após 3 tentativas de login com credenciais inválidas. Bloqueio por 5 minutos.')
     }
    })
   })
