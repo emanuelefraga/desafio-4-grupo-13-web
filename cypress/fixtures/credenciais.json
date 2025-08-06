@@ -3,5 +3,15 @@
   {
     "email": "aluno3@universidade.edu.br",
     "senha": "987653"
+  },
+  "valida":
+  {
+    "email": "aluno1@universidade.edu.br",
+    "senha": "123456"
+  },
+  "bloqueada":
+  {
+    "email": "aluno2@universidade.edu.br",
+    "senha": "123456"
   }
 }
