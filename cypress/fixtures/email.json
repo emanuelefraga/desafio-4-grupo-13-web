@@ -4,5 +4,8 @@
     },
     "formatoInvalido":{
         "email": "aluno3@universidade"
+    },
+    "formatoIncorreto":{
+        "email": "alunoincorreto@universidade.edu.br"
     }
 }
