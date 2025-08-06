@@ -8,7 +8,7 @@
 // - Limpeza automática de dados ao fechar aba
 
 // URL base da API externa
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = 'http://localhost:3002';
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM carregado, inicializando aplicação...');
