@@ -10,9 +10,6 @@ Frontend para o sistema de Login Acadêmico - Sistema Universitário, desenvolvi
 - ✅ **Login inválido**: Tratamento de credenciais incorretas
 - ✅ **Bloqueio de conta**: Bloqueia a conta após 3 tentativas de login inválidas
 - ✅ **Lembrar senha**: Funcionalidade para recuperação de senha
-- ✅ **Verificar status da conta**: Consulta o status do usuário (bloqueio, tentativas restantes, etc.)
-- ✅ **Dashboard responsivo**: Interface moderna com MaterializeCSS
-- ✅ **Persistência de sessão**: Mantém o usuário logado usando localStorage
 
 ## Tecnologias Utilizadas
 
@@ -21,12 +18,6 @@ Frontend para o sistema de Login Acadêmico - Sistema Universitário, desenvolvi
 - **CSS3** - Estilização com MaterializeCSS
 - **JavaScript (ES6+)** - Lógica do frontend
 - **MaterializeCSS** - Framework CSS para design responsivo
-
-### Backend
-- **Node.js** - Runtime JavaScript
-- **Express.js** - Framework web
-- **CORS** - Cross-Origin Resource Sharing
-- **Body Parser** - Parsing de requisições
 
 ## Instalação
 
@@ -43,12 +34,6 @@ npm install
 
 ## Executando o Projeto
 
-### Desenvolvimento
-```bash
-npm run dev
-```
-
-### Produção
 ```bash
 npm start
 ```
@@ -62,23 +47,9 @@ Após iniciar o servidor, acesse:
 http://localhost:3002
 ```
 
-## Endpoints da API
-
-### Base URL
-```
-http://localhost:3002
-```
-
-### Endpoints Disponíveis
-
-- `POST /api/auth/login` - Realizar login
-- `POST /api/auth/remember-password` - Solicitar lembrança de senha
-- `GET /api/auth/status` - Verificar status da conta
-- `POST /api/auth/logout` - Realizar logout
-
 ## Dados de Teste
 
-### Usuários Cadastrados (em memória)
+### Usuários Cadastrados (em memória - na API)
 
 1. **Aluno 1**
    - Email: `aluno1@universidade.edu.br`
@@ -119,7 +90,6 @@ desafio-4-grupo13-web/
 - Formulário de login com validação
 - Informações de teste para facilitar os testes
 - Link para recuperação de senha
-- Verificação automática do status da conta
 
 ### Modal de Recuperação de Senha
 - Formulário para solicitar recuperação de senha
@@ -132,20 +102,6 @@ desafio-4-grupo13-web/
 - Lista de disciplinas baseada no curso
 - Botão de logout
 
-### Recursos Visuais
-- Design responsivo com MaterializeCSS
-- Animações suaves
-- Mensagens de feedback (sucesso, erro, aviso)
-- Loading spinners durante requisições
-- Gradiente de fundo moderno
-
-## Segurança
-
-- Validação de formulários no frontend
-- Sanitização de dados
-- Feedback de segurança (tentativas restantes, bloqueio de conta)
-- Persistência segura de sessão no localStorage
-
 ## Testes
 
 Este projeto foi desenvolvido para estudos de teste de software. Os cenários de teste incluem:
@@ -153,27 +109,14 @@ Este projeto foi desenvolvido para estudos de teste de software. Os cenários de
 ### Cenários de Login
 - Login com credenciais válidas
 - Login com senha incorreta
-- Login com email inexistente
 - Bloqueio de conta após 3 tentativas
-- Verificação de status da conta
 
 ### Cenários de Recuperação de Senha
 - Solicitação com email válido
+- Solicitação com email formato inválido
 - Solicitação com email inválido
 - Solicitação com email vazio
 
-### Cenários de Interface
-- Responsividade em diferentes dispositivos
-- Validação de formulários
-- Feedback visual de ações
-- Persistência de sessão
-
-## Desenvolvimento
-
-### Scripts Disponíveis
-
-- `npm start` - Inicia o servidor em modo produção
-- `npm run dev` - Inicia o servidor em modo desenvolvimento com nodemon
 
 ### Estrutura de Arquivos
 
