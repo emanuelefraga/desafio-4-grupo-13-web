@@ -1,73 +1,15 @@
-# Sistema Acadêmico - Frontend
+# Sistema Acadêmico - Testes Automatizados com Cypress
 
-## Descrição
+## Objetivo
 
-Frontend para o sistema de Login Acadêmico - Sistema Universitário, desenvolvido para estudos de teste de software. Este projeto consome a API REST desenvolvida em JavaScript com Express para autenticação de usuários em um sistema acadêmico universitário.
+Este projeto foi desenvolvido em grupo durante a Mentoria 2.0 de Julio de Lima, com o objetivo de reforçar o aprendizado de automação de testes utilizando Cypress e JavaScript. O foco é validar funcionalidades essenciais do sistema acadêmico universitário, garantindo a qualidade do frontend e da API REST.
 
-## Funcionalidades
+## Componentes do Projeto
 
-- ✅ **Login com sucesso**: Autenticação válida de usuários
-- ✅ **Login inválido**: Tratamento de credenciais incorretas
-- ✅ **Bloqueio de conta**: Bloqueia a conta após 3 tentativas de login inválidas
-- ✅ **Lembrar senha**: Funcionalidade para recuperação de senha
+O projeto é composto por:
 
-## Tecnologias Utilizadas
-
-### Frontend
-- **HTML5** - Estrutura da página
-- **CSS3** - Estilização com MaterializeCSS
-- **JavaScript (ES6+)** - Lógica do frontend
-- **MaterializeCSS** - Framework CSS para design responsivo
-
-## Instalação
-
-1. Clone o repositório
-```bash
-git clone <url-do-repositorio>
-cd desafio-4-grupo13-web
-```
-
-2. Instale as dependências:
-```bash
-npm install
-```
-
-## Executando o Projeto
-
-```bash
-npm start
-```
-
-O servidor será iniciado na porta 3002 por padrão.
-
-## Acessando o Site
-
-Após iniciar o servidor, acesse:
-```
-http://localhost:3002
-```
-
-## Dados de Teste
-
-### Usuários Cadastrados (em memória - na API)
-
-1. **Aluno 1**
-   - Email: `aluno1@universidade.edu.br`
-   - Senha: `123456`
-   - Tipo: `aluno`
-   - Curso: `Engenharia de Software`
-
-2. **Aluno 2**
-   - Email: `aluno2@universidade.edu.br`
-   - Senha: `654321`
-   - Tipo: `aluno`
-   - Curso: `Ciência da Computação`
-
-3. **Aluno 3**
-   - Email: `aluno3@universidade.edu.br`
-   - Senha: `987654`
-   - Tipo: `aluno`
-   - Curso: `Sistemas de Informação`
+- **Frontend Web**: Aplicação desenvolvida em HTML, CSS (MaterializeCSS) e JavaScript, responsável pela interface do usuário.
+- **Testes Automatizados**: Scripts Cypress para automação dos testes end-to-end do sistema.
 
 ## Estrutura do Projeto
 
@@ -84,66 +26,70 @@ desafio-4-grupo13-web/
         └── app.js        # Lógica do frontend
 ```
 
-## Funcionalidades do Frontend
+## Pré-requisitos
 
-### Página de Login
-- Formulário de login com validação
-- Informações de teste para facilitar os testes
-- Link para recuperação de senha
+- Node.js instalado
+- npm instalado
 
-### Modal de Recuperação de Senha
-- Formulário para solicitar recuperação de senha
-- Validação de email
-- Feedback visual do processo
+## Instalação e Execução
 
-### Dashboard
-- Informações pessoais do usuário
-- Informações acadêmicas (curso, semestre, departamento)
-- Lista de disciplinas baseada no curso
-- Botão de logout
+1. **Clone o repositório do frontend:**
+   ```bash
+   git clone https://github.com/emanuelefraga/desafio-4-grupo-13-web.git
+   cd desafio-4-grupo13-web
+   npm install
+   ```
 
-## Testes
+2. **Clone o repositório da API:**
+   ```bash
+   git clone https://github.com/emanuelefraga/desafio-3-grupo-13.git
+   cd desafio-3-grupo-13
+   npm install
+   npm start
+   ```
+   > A API será executada na porta padrão definida no projeto.
 
-Este projeto foi desenvolvido para estudos de teste de software. Os cenários de teste incluem:
+3. **Execute o frontend:**
+   ```bash
+   cd desafio-4-grupo13-web
+   npm start
+   ```
+   > O servidor frontend será iniciado na porta 3002 por padrão.
 
-### Cenários de Login
+4. **Execute os testes automatizados com Cypress:**
+   ```bash
+   npx cypress open
+   ```
+   > Certifique-se de que tanto a API quanto o frontend estejam em execução antes de rodar os testes.
+
+## Documentação dos Testes
+
+Os testes automatizados com Cypress cobrem os seguintes cenários:
+
+### Login
+
 - Login com credenciais válidas
 - Login com senha incorreta
-- Bloqueio de conta após 3 tentativas
+- Bloqueio de conta após 3 tentativas inválidas
 
-### Cenários de Recuperação de Senha
+### Recuperação de Senha
+
 - Solicitação com email válido
-- Solicitação com email formato inválido
-- Solicitação com email inválido
-- Solicitação com email vazio
+- Solicitação com email em formato inválido
+- Solicitação com email inexistente
+- Solicitação com campo de email vazio
 
+### Dashboard
 
-### Estrutura de Arquivos
+- Exibição das informações do usuário após login
+- Listagem de disciplinas conforme o curso
 
-- `server.js` - Configuração do servidor Express e rotas da API
-- `public/index.html` - Estrutura HTML da aplicação
-- `public/css/style.css` - Estilos customizados
-- `public/js/app.js` - Lógica JavaScript do frontend
+Os testes estão localizados na pasta `cypress/e2e` do projeto.
 
-## Contribuição
+## Autores e Participantes
 
-Este projeto foi desenvolvido para estudos de teste de software. Para contribuir:
+Projeto desenvolvido em grupo durante a Mentoria 2.0 de Julio de Lima.
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
-
-## Licença
-
-MIT
-
-## Créditos
-
-Este projeto foi desenvolvido em grupo durante a mentoria de [Julio de Lima].
-
-**Participantes do grupo:**
 - [Ana Cláudia Coelho](https://github.com/acnscoelho)
 - [Emanuele Fraga](https://github.com/emanuelefraga)
 - [Ludmila Ávila](https://github.com/ludmilavila)
@@ -151,9 +97,9 @@ Este projeto foi desenvolvido em grupo durante a mentoria de [Julio de Lima].
 
 ## Observações Importantes
 
-⚠️ **ATENÇÃO**: Este projeto é destinado apenas para estudos de teste de software. Não utilize em ambiente de produção.
+⚠️ **ATENÇÃO**: Este projeto é destinado apenas para estudos de automação de testes. Não utilize em ambiente de produção.
 
 - Dados armazenados em memória (não persistem após reinicialização)
 - Sem validações robustas de produção
 - Configurações de segurança básicas para demonstração
-- Interface desenvolvida para facilitar testes automatizados 
+- Interface desenvolvida para facilitar testes automatizados
