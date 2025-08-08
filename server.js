@@ -94,7 +94,7 @@ app.post('/api/auth/login', (req, res) => {
     if (usuario.bloqueado) {
         return res.status(401).json({
             success: false,
-            message: 'Conta bloqueada após 3 tentativas inválidas!'
+            message: 'Conta bloqueada após 3 tentativas de login com credenciais inválidas. Bloqueio por 5 minutos.'
         });
     }
     
@@ -112,14 +112,14 @@ app.post('/api/auth/login', (req, res) => {
             console.log(`🚨 CONTA BLOQUEADA para ${email}!`);
             return res.status(401).json({
                 success: false,
-                message: 'Conta bloqueada após 3 tentativas inválidas!'
+                message: 'Conta bloqueada após 3 tentativas de login com credenciais inválidas. Bloqueio por 5 minutos.'
             });
         }
         
         console.log(`⚠️ Tentativa incorreta para ${email}. Tentativas atuais: ${usuario.tentativas}, Restantes: ${3 - usuario.tentativas}`);
         return res.status(401).json({
             success: false,
-            message: `Senha incorreta! Tentativas restantes: ${3 - usuario.tentativas}`
+            message: `Email ou senha inválidos. Tentativas restantes: ${3 - usuario.tentativas}`
         });
     }
     
@@ -143,7 +143,7 @@ app.post('/api/auth/login', (req, res) => {
         success: true,
         message: 'Login realizado com sucesso!',
         sessionId: sessionId,
-        usuario: {
+        user: {
             id: usuario.id,
             nome: usuario.nome,
             email: usuario.email,
@@ -259,6 +259,38 @@ app.post('/api/auth/logout', (req, res) => {
     res.json({
         success: true,
         message: 'Logout realizado com sucesso!'
+    });
+});
+
+// Rota para resetar estado do usuário (para testes)
+app.post('/api/auth/reset-state', (req, res) => {
+    const { email } = req.body;
+    
+    if (!email) {
+        return res.status(400).json({
+            success: false,
+            message: 'Email é obrigatório!'
+        });
+    }
+    
+    const usuario = usuarios.find(u => u.email === email);
+    
+    if (!usuario) {
+        return res.status(404).json({
+            success: false,
+            message: 'Usuário não encontrado!'
+        });
+    }
+    
+    // Resetar estado do usuário
+    usuario.tentativas = 0;
+    usuario.bloqueado = false;
+    
+    console.log(`🔄 Estado resetado para ${email}: tentativas=0, bloqueado=false`);
+    
+    res.json({
+        success: true,
+        message: 'Estado do usuário resetado com sucesso!'
     });
 });
 

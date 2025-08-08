@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "cypress": "^14.5.3",
+    "cypress-mochawesome-reporter": "^3.8.2",
     "nodemon": "^3.0.1"
   },
   "repository": {
